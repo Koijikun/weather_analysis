@@ -56,30 +56,56 @@ class api_handler():
         foodItem = self.get_food_by_id(fdcId)
         structure: Dict[str, any] = {
             "fdcId": fdcId,
+            "per" : "",
             "data": {
                 "kcal": {
                     "id": 1008,
-                    "name": "Energy"
+                    "name": "",
+                    "unitName": "",
+                    "value": 0
                 },
                 "fat": {
                     "id": 1004,
-                    "name": "Total lipid (fat)"
+                    "name": "",
+                    "unitName": "",
+                    "value": 0
                 },
                 "protein": {
                     "id": 1003,
-                    "name": "Protein"
+                    "name": "",
+                    "unitName": "",
+                    "value": 0
                 },
                 "fiber": {
                     "id": 1079,
-                    "name": "Fiber, total dietary 1079"
+                    "name": "",
+                    "unitName": "",
+                    "value": 0
                 }
             }
         }
+        structure["per"] = foodItem["householdServingFullText"]
+        for nutrient in foodItem["foodNutrients"]:
+            if nutrient["nutrient"]["id"] == 1008:
+                structure["data"]["kcal"]["name"] = nutrient["nutrient"]["name"]
+                structure["data"]["kcal"]["unitName"] = nutrient["nutrient"]["unitName"]
+                structure["data"]["kcal"]["value"] = foodItem["labelNutrients"]["calories"]["value"]
+            elif nutrient["nutrient"]["id"] == 1004:
+                structure["data"]["fat"]["name"] = nutrient["nutrient"]["name"]
+                structure["data"]["fat"]["unitName"] = nutrient["nutrient"]["unitName"]
+                structure["data"]["fat"]["value"] = foodItem["labelNutrients"]["fat"]["value"]
+            elif nutrient["nutrient"]["id"] == 1003:
+                structure["data"]["protein"]["name"] = nutrient["nutrient"]["name"]
+                structure["data"]["protein"]["unitName"] = nutrient["nutrient"]["unitName"]
+                structure["data"]["protein"]["value"] = foodItem["labelNutrients"]["protein"]["value"]
+            elif nutrient["nutrient"]["id"] == 1079:
+                structure["data"]["fiber"]["name"] = nutrient["nutrient"]["name"]
+                structure["data"]["fiber"]["unitName"] = nutrient["nutrient"]["unitName"]
+                structure["data"]["fiber"]["value"] = foodItem["labelNutrients"]["fiber"]["value"]
+        return structure
+        
         
     
 
     def pretty_print(self,variable):
         return print(json.dumps(variable, indent=4, sort_keys=True))
-    
-api = api_handler()
-api.pretty_print(api.get_food_by_id(api.summary_search("meat")[0]["fdcId"]))
