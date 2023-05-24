@@ -1,15 +1,15 @@
 import json
 import requests
 
-class Api():
-    def get_data_by_query(query, returnType = "python"):
+class api_handler():
+    def get_data_by_query(self, query, returnType = "python"):
         response = requests.get(query)
         jsonFormat = json.dumps(response.json())
         if returnType == "python":
             return json.loads(jsonFormat)
         return jsonFormat
 
-    def generateQuery(type, query = [["query", "Cheddar Cheese"], ["pageSize", 10], ["pageNumber", 1]]):
+    def generate_query(sef, type, query = [["query", "Cheddar Cheese"], ["pageSize", 10], ["pageNumber", 1]]):
         baseURL = "https://api.nal.usda.gov/fdc/v1/"
         queryString = ""
         apiKey = "D3OJjtrugLUL5Q7wzGadlQnF2FOjSFcW1ol3IKsu"
@@ -26,12 +26,12 @@ class Api():
         print(queryString)
         return baseURL + queryString
 
-    def searchQuery(search, pageSize = 10, pageNumber = 1):
-        return generateQuery("search", query = [["query", search], ["pageSize", pageSize], ["pageNumber", pageNumber]])
+    def search_query(self, search, pageSize = 10, pageNumber = 1):
+        return self.generate_query("search", query = [["query", search], ["pageSize", pageSize], ["pageNumber", pageNumber]])
 
-    def summarySearch(search, pageSize = 10, pageNumber = 1):
-        query = generateQuery("search", query = [["query", search], ["pageSize", pageSize], ["pageNumber", pageNumber]])
-        data = getDataByQuery(query)
+    def summary_search(self,search, pageSize = 10, pageNumber = 1):
+        query = self.generate_query("search", query = [["query", search], ["pageSize", pageSize], ["pageNumber", pageNumber]])
+        data = self.get_data_by_query(query)
         titles = [
             "fdcId",
             "description",
@@ -47,9 +47,16 @@ class Api():
                     foods[i][titles[j]] = data["foods"][i][titles[j]]
         return foods
 
-    def getFoodById(fdcId):
-        query = generateQuery("food", query = fdcId)
-        return getDataByQuery(query)
+    def get_food_by_id(self,fdcId):
+        query = self.generate_query("food", query = fdcId)
+        return self.get_data_by_query(query)
+    
+    def get_storeable_food_data(self){
 
-    def prettyPrint(variable):
+    }
+
+    def pretty_print(self,variable):
         return print(json.dumps(variable, indent=4, sort_keys=True))
+    
+api = api_handler()
+api.pretty_print(api.get_food_by_id(api.summary_search("meat")[0]["fdcId"]))
