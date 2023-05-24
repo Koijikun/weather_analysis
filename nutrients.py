@@ -10,7 +10,7 @@ class api_handler():
             return json.loads(jsonFormat)
         return jsonFormat
 
-    def generate_query(sef, type, query = [["query", "Cheddar Cheese"], ["pageSize", 10], ["pageNumber", 1]]):
+    def generate_query(self, type, query = [["query", "Cheddar Cheese"], ["pageSize", 10], ["pageNumber", 1]]):
         baseURL = "https://api.nal.usda.gov/fdc/v1/"
         queryString = ""
         apiKey = "D3OJjtrugLUL5Q7wzGadlQnF2FOjSFcW1ol3IKsu"
@@ -52,7 +52,7 @@ class api_handler():
         query = self.generate_query("food", query = fdcId)
         return self.get_data_by_query(query)
     
-    def get_storeable_food_data_by_id(self, fdcId):
+    def get_storeable_food_data(self, fdcId):
         foodItem = self.get_food_by_id(fdcId)
         structure: Dict[str, any] = {
             "fdcId": fdcId,

@@ -9,5 +9,3 @@ class nutritiondata():
         self.fibres=fibres
         self.protein=protein
         self.fat=fat
-
-    
