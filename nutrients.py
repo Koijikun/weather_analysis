@@ -51,8 +51,8 @@ class api_handler():
         query = self.generate_query("food", query = fdcId)
         return self.get_data_by_query(query)
     
-    def get_storeable_food_data(self){
-
+    def get_storeable_food_data_by_id(self){
+        
     }
 
     def pretty_print(self,variable):
