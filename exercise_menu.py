@@ -1,7 +1,7 @@
 import exercises as ex
 
 def display_menu():
-    print("----------------------\nWorkout Tracker\n----------------------")
+    print("\n----------------------\nWorkout Tracker\n----------------------")
     print("What are we doing today?\n[1] Training\n[2] Change Exercise\n[3] Food Tracker\n[4] Progress Tracker\n[0] Quit")
 
 def display_training_options():
@@ -77,7 +77,11 @@ def train_exercises(col):
         if ex_count == ex_count_input:
             break
         if 'weight' in exercise:
-            print(f"{exercise['name']} - {exercise['weight']} kg x {exercise['rep_goal']} reps")
+            print(f"{exercise['name']} - {exercise['weight']} kg x {exercise['rep_goal']} reps\n----------------------")
+            print ("Instructions:")
+            for i in exercise['instructions']:
+                print (i)
         elif 'dur_goal' in exercise:
             print(f"{exercise['name']} - {exercise['dur_goal']} seconds")
+            print (exercise['instructions'])
         ex_count += 1
