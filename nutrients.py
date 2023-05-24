@@ -1,5 +1,6 @@
 import json
 import requests
+import datetime
 from typing import Dict
 
 class api_handler():
@@ -54,8 +55,11 @@ class api_handler():
     
     def get_storeable_food_data(self, fdcId):
         foodItem = self.get_food_by_id(fdcId)
+        dateString = json.dumps({'date': datetime.date.today()}, default=str)
+        dateDict = json.loads(dateString)
         structure: Dict[str, any] = {
             "fdcId": fdcId,
+            "date": f'{dateDict["date"]}',
             "per" : "",
             "data": {
                 "kcal": {
@@ -84,28 +88,25 @@ class api_handler():
                 }
             }
         }
-        structure["per"] = foodItem["householdServingFullText"]
+        structure["per"] = foodItem.get("householdServingFullText", "")
         for nutrient in foodItem["foodNutrients"]:
             if nutrient["nutrient"]["id"] == 1008:
-                structure["data"]["kcal"]["name"] = nutrient["nutrient"]["name"]
-                structure["data"]["kcal"]["unitName"] = nutrient["nutrient"]["unitName"]
-                structure["data"]["kcal"]["value"] = foodItem["labelNutrients"]["calories"]["value"]
+                structure["data"]["kcal"]["name"] = nutrient.get("nutrient", {}).get("name", "")
+                structure["data"]["kcal"]["unitName"] = nutrient.get("nutrient", {}).get("unitName", "")
+                structure["data"]["kcal"]["value"] = nutrient.get("labelNutrients", {}).get("calories", {}).get("value", 0)
             elif nutrient["nutrient"]["id"] == 1004:
-                structure["data"]["fat"]["name"] = nutrient["nutrient"]["name"]
-                structure["data"]["fat"]["unitName"] = nutrient["nutrient"]["unitName"]
-                structure["data"]["fat"]["value"] = foodItem["labelNutrients"]["fat"]["value"]
+                structure["data"]["fat"]["name"] = nutrient.get("nutrient", {}).get("name", "")
+                structure["data"]["fat"]["unitName"] = nutrient.get("nutrient", {}).get("unitName", "")
+                structure["data"]["fat"]["value"] = foodItem.get("labelNutrients", {}).get("fat", {}).get("value", 0)
             elif nutrient["nutrient"]["id"] == 1003:
-                structure["data"]["protein"]["name"] = nutrient["nutrient"]["name"]
-                structure["data"]["protein"]["unitName"] = nutrient["nutrient"]["unitName"]
-                structure["data"]["protein"]["value"] = foodItem["labelNutrients"]["protein"]["value"]
+                structure["data"]["protein"]["name"] = nutrient.get("nutrient", {}).get("name", "")
+                structure["data"]["protein"]["unitName"] = nutrient.get("nutrient", {}).get("unitName", "")
+                structure["data"]["protein"]["value"] = foodItem.get("labelNutrients", {}).get("protein", {}).get("value", 0)
             elif nutrient["nutrient"]["id"] == 1079:
-                structure["data"]["fiber"]["name"] = nutrient["nutrient"]["name"]
-                structure["data"]["fiber"]["unitName"] = nutrient["nutrient"]["unitName"]
-                structure["data"]["fiber"]["value"] = foodItem["labelNutrients"]["fiber"]["value"]
+                structure["data"]["fiber"]["name"] = nutrient.get("nutrient", {}).get("name", "")
+                structure["data"]["fiber"]["unitName"] = nutrient.get("nutrient", {}).get("unitName", "")
+                structure["data"]["fiber"]["value"] = foodItem.get("labelNutrients", {}).get("fiber", {}).get("value", 0)
         return structure
-        
-        
-    
 
     def pretty_print(self,variable):
         return print(json.dumps(variable, indent=4, sort_keys=True))
