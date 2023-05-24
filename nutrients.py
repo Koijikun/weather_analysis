@@ -1,19 +1,55 @@
-import http.client
 import json
+import requests
 
-conn = http.client.HTTPSConnection("edamam-edamam-nutrition-analysis.p.rapidapi.com")
+class Api():
+    def get_data_by_query(query, returnType = "python"):
+        response = requests.get(query)
+        jsonFormat = json.dumps(response.json())
+        if returnType == "python":
+            return json.loads(jsonFormat)
+        return jsonFormat
 
-headers = {
-    'X-RapidAPI-Key': "d357136464msha539dd78922eecfp14e9a3jsn5a0330d2be3a",
-    'X-RapidAPI-Host': "edamam-edamam-nutrition-analysis.p.rapidapi.com"
-}
+    def generateQuery(type, query = [["query", "Cheddar Cheese"], ["pageSize", 10], ["pageNumber", 1]]):
+        baseURL = "https://api.nal.usda.gov/fdc/v1/"
+        queryString = ""
+        apiKey = "D3OJjtrugLUL5Q7wzGadlQnF2FOjSFcW1ol3IKsu"
+        if type == "search":
+            baseURL += "foods/search"
+        elif type == "food":
+            return baseURL + "food/"+ f'{query}' + "?api_key=" + apiKey
+        else:
+            print("Invalid type")
+            return
+        baseURL += "?api_key=" + apiKey
+        for i in range(len(query)):
+            queryString += "&" + query[i][0] + "=" + str(query[i][1])
+        print(queryString)
+        return baseURL + queryString
 
-conn.request("GET", "/api/nutrition-data?ingr=meat&nutrition-type=logging", headers=headers)
+    def searchQuery(search, pageSize = 10, pageNumber = 1):
+        return generateQuery("search", query = [["query", search], ["pageSize", pageSize], ["pageNumber", pageNumber]])
 
-res = conn.getresponse()
-data = res.read()
+    def summarySearch(search, pageSize = 10, pageNumber = 1):
+        query = generateQuery("search", query = [["query", search], ["pageSize", pageSize], ["pageNumber", pageNumber]])
+        data = getDataByQuery(query)
+        titles = [
+            "fdcId",
+            "description",
+            "commonNames",
+            "additionalDescriptions",
+            "foodCategory"
+        ]
+        foods = {}
+        for i in range(len(data["foods"])):
+            foods[i] = {}
+            for j in range(len(titles)):
+                if titles[j] in data["foods"][i]:
+                    foods[i][titles[j]] = data["foods"][i][titles[j]]
+        return foods
 
-jsonData = json.loads(data.decode("utf-8"))
-jsonPretty = json.dumps(jsonData, indent=2)
+    def getFoodById(fdcId):
+        query = generateQuery("food", query = fdcId)
+        return getDataByQuery(query)
 
-print(jsonPretty)
+    def prettyPrint(variable):
+        return print(json.dumps(variable, indent=4, sort_keys=True))
