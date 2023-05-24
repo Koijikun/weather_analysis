@@ -2,6 +2,7 @@ import exercises as ex
 import exercise_menu as exm
 import pymongo
 from pymongo import MongoClient
+import nutrients as api
 
 client = MongoClient("mongodb+srv://sp:N47wPDX4AZb0GYla@scientificp.xozqbzt.mongodb.net/")
 db = client["workout"]
@@ -37,7 +38,11 @@ while menu_input != 0:
             else:
                 print("Please only enter 1, 2, or 3")
         elif menu_input == 3:
-            print("You selected 3")
+            user_input = exm.get_user_input("Please enter\n[1] to add food\n[2] to analyze your nutrition\n>")
+            if user_input == 1:
+                print(api.api_handler.summary_search("egg"))
+            elif user_input == 2:
+                print("Placeholder for PandaParty")
         elif menu_input == 4:
             print("You selected 4")
         elif menu_input != 0:
