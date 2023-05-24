@@ -25,7 +25,6 @@ class api_handler():
         baseURL += "?api_key=" + apiKey
         for i in range(len(query)):
             queryString += "&" + query[i][0] + "=" + str(query[i][1])
-        print(queryString)
         return baseURL + queryString
 
     def search_query(self, search, pageSize = 10, pageNumber = 1):
@@ -41,12 +40,16 @@ class api_handler():
             "additionalDescriptions",
             "foodCategory"
         ]
-        foods = {}
+        foods = []
         for i in range(len(data["foods"])):
-            foods[i] = {}
+            foods.append({})
             for j in range(len(titles)):
                 if titles[j] in data["foods"][i]:
                     foods[i][titles[j]] = data["foods"][i][titles[j]]
+            #if foods doesn't contain all the titles, add them with a value of ""
+            for j in range(len(titles)):
+                if titles[j] not in foods[i]:
+                    foods[i][titles[j]] = ""  
         return foods
 
     def get_food_by_id(self,fdcId):
@@ -59,9 +62,10 @@ class api_handler():
         dateDict = json.loads(dateString)
         structure: Dict[str, any] = {
             "fdcId": fdcId,
-            "date": f'{dateDict["date"]}',
+            "name": foodItem.get("description", ""),
+            "date": int(dateDict["date"].replace("-", "")),
             "per" : "",
-            "data": {
+            "nutrients": {
                 "kcal": {
                     "id": 1008,
                     "name": "",
@@ -91,22 +95,19 @@ class api_handler():
         structure["per"] = foodItem.get("householdServingFullText", "")
         for nutrient in foodItem["foodNutrients"]:
             if nutrient["nutrient"]["id"] == 1008:
-                structure["data"]["kcal"]["name"] = nutrient.get("nutrient", {}).get("name", "")
-                structure["data"]["kcal"]["unitName"] = nutrient.get("nutrient", {}).get("unitName", "")
-                structure["data"]["kcal"]["value"] = nutrient.get("labelNutrients", {}).get("calories", {}).get("value", 0)
+                structure["nutrients"]["kcal"]["name"] = nutrient.get("nutrient", {}).get("name", "")
+                structure["nutrients"]["kcal"]["unitName"] = nutrient.get("nutrient", {}).get("unitName", "")
+                structure["nutrients"]["kcal"]["value"] = nutrient.get("labelNutrients", {}).get("calories", {}).get("value", 0)
             elif nutrient["nutrient"]["id"] == 1004:
-                structure["data"]["fat"]["name"] = nutrient.get("nutrient", {}).get("name", "")
-                structure["data"]["fat"]["unitName"] = nutrient.get("nutrient", {}).get("unitName", "")
-                structure["data"]["fat"]["value"] = foodItem.get("labelNutrients", {}).get("fat", {}).get("value", 0)
+                structure["nutrients"]["fat"]["name"] = nutrient.get("nutrient", {}).get("name", "")
+                structure["nutrients"]["fat"]["unitName"] = nutrient.get("nutrient", {}).get("unitName", "")
+                structure["nutrients"]["fat"]["value"] = foodItem.get("labelNutrients", {}).get("fat", {}).get("value", 0)
             elif nutrient["nutrient"]["id"] == 1003:
-                structure["data"]["protein"]["name"] = nutrient.get("nutrient", {}).get("name", "")
-                structure["data"]["protein"]["unitName"] = nutrient.get("nutrient", {}).get("unitName", "")
-                structure["data"]["protein"]["value"] = foodItem.get("labelNutrients", {}).get("protein", {}).get("value", 0)
+                structure["nutrients"]["protein"]["name"] = nutrient.get("nutrient", {}).get("name", "")
+                structure["nutrients"]["protein"]["unitName"] = nutrient.get("nutrient", {}).get("unitName", "")
+                structure["nutrients"]["protein"]["value"] = foodItem.get("labelNutrients", {}).get("protein", {}).get("value", 0)
             elif nutrient["nutrient"]["id"] == 1079:
-                structure["data"]["fiber"]["name"] = nutrient.get("nutrient", {}).get("name", "")
-                structure["data"]["fiber"]["unitName"] = nutrient.get("nutrient", {}).get("unitName", "")
-                structure["data"]["fiber"]["value"] = foodItem.get("labelNutrients", {}).get("fiber", {}).get("value", 0)
+                structure["nutrients"]["fiber"]["name"] = nutrient.get("nutrient", {}).get("name", "")
+                structure["nutrients"]["fiber"]["unitName"] = nutrient.get("nutrient", {}).get("unitName", "")
+                structure["nutrients"]["fiber"]["value"] = foodItem.get("labelNutrients", {}).get("fiber", {}).get("value", 0)
         return structure
-
-    def pretty_print(self,variable):
-        return print(json.dumps(variable, indent=4, sort_keys=True))
