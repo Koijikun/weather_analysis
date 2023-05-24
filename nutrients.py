@@ -1,5 +1,6 @@
 import json
 import requests
+from typing import Dict
 
 class api_handler():
     def get_data_by_query(self, query, returnType = "python"):
@@ -51,30 +52,31 @@ class api_handler():
         query = self.generate_query("food", query = fdcId)
         return self.get_data_by_query(query)
     
-    def get_storeable_food_data_by_id(self,fdcId){
-        foodItem = get_food_by_id(fdcId)
-        structure = {
-            "fdcId",
-            "data" : {
-                "kcal" : [
-                    "id" : 1008,
-                    "name" : "Energy"
-                ],
-                "fat" : [
-                    "id" : 1004,
-                    "name" : "Total lipid (fat)"
-                ],
-                "protein" : [
-                    "id" : 1003,
-                    "name" : "Protein"
-                ],
-                "fiber" : [
-                    "id" : 1079,
-                    "name" : "Fiber, total dietary 1079"
-                ]
+    def get_storeable_food_data_by_id(self, fdcId):
+        foodItem = self.get_food_by_id(fdcId)
+        structure: Dict[str, any] = {
+            "fdcId": fdcId,
+            "data": {
+                "kcal": {
+                    "id": 1008,
+                    "name": "Energy"
+                },
+                "fat": {
+                    "id": 1004,
+                    "name": "Total lipid (fat)"
+                },
+                "protein": {
+                    "id": 1003,
+                    "name": "Protein"
+                },
+                "fiber": {
+                    "id": 1079,
+                    "name": "Fiber, total dietary 1079"
+                }
             }
         }
-    }
+        
+    
 
     def pretty_print(self,variable):
         return print(json.dumps(variable, indent=4, sort_keys=True))
