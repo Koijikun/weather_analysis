@@ -1,8 +1,9 @@
 import exercises as ex
 import exercise_menu as exm
+import pymongo
 from pymongo import MongoClient
 
-client = MongoClient("mongodb+srv://Oliver:webstar12@cluster0.t1xphxx.mongodb.net/cluster0")
+client = MongoClient("mongodb+srv://sp:N47wPDX4AZb0GYla@scientificp.xozqbzt.mongodb.net/")
 db = client["workout"]
 col = db["exercises"]
 
