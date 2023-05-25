@@ -18,15 +18,6 @@ class food_pandas:
             nutrients[key] = self.get_nutrient_values_from_food(food)
         return nutrients
     
-    def convert_food_to_dict(self, food: Dict[str, any]) -> Dict[str, any]:
-        return {
-            "fdcId": food["fdcId"],
-            "name": food["name"],
-            "date": food["date"],
-            "per": food["per"],
-            "nutrients": self.get_nutrient_values_from_food(food)
-        }
-    
     def convert_food_nutrient_values_to_df(self, foods: Dict[str, any], add_date=False) -> pd.DataFrame:
         return pd.DataFrame.from_dict(self.get_nutrient_values_from_foods(foods, add_date))
     
