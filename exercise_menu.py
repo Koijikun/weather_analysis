@@ -3,7 +3,7 @@ import helper_functions as hf
 
 def display_menu():
     print("\n----------------------\nWorkout Tracker\n----------------------")
-    print("What are we doing today?\n[1] Training\n[2] Change Exercise\n[3] Food Tracker\n[4] Progress Tracker\n[0] Quit")
+    print("What are we doing today?\n[1] Training\n[2] Change Exercise\n[3] Food Tracker\n[0] Quit")
 
 def display_training_options():
     print("What would you like to train today?\n[1] Core\n[2] Arms\n[3] Chest\n[4] Legs")

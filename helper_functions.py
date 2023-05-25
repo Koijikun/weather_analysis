@@ -1,5 +1,5 @@
-
-
+import json
+import datetime
 def get_user_input(message):
     while True:
         try:
@@ -8,10 +8,12 @@ def get_user_input(message):
         except ValueError:
             print("Please only enter a valid integer.")
 
-@staticmethod
+
 def get_string_input(message):
     return str(input(message))
 
-@staticmethod
 def pretty_print(variable):
     return print(json.dumps(variable, indent=4, sort_keys=True))
+
+def get_today():
+    return int(json.loads(json.dumps({'date': datetime.date.today()}, default=str))['date'].replace("-", ""))

@@ -1,9 +1,10 @@
 import json
 import requests
-import datetime
+import helper_functions as hf
 from typing import Dict
 
 class api_handler():
+    #get the data of food items by the generated query
     def get_data_by_query(self, query, returnType = "python"):
         response = requests.get(query)
         jsonFormat = json.dumps(response.json())
@@ -11,6 +12,7 @@ class api_handler():
             return json.loads(jsonFormat)
         return jsonFormat
 
+    #generate a query to get data about food items
     def generate_query(self, type, query = [["query", "Cheddar Cheese"], ["pageSize", 10], ["pageNumber", 1]]):
         baseURL = "https://api.nal.usda.gov/fdc/v1/"
         queryString = ""
@@ -27,12 +29,15 @@ class api_handler():
             queryString += "&" + query[i][0] + "=" + str(query[i][1])
         return baseURL + queryString
 
+    #generate a query to search for a food item
     def search_query(self, search, pageSize = 10, pageNumber = 1):
         return self.generate_query("search", query = [["query", search], ["pageSize", pageSize], ["pageNumber", pageNumber]])
 
+    #simplify the search results to only the data that we need
     def summary_search(self,search, pageSize = 10, pageNumber = 1):
         query = self.generate_query("search", query = [["query", search], ["pageSize", pageSize], ["pageNumber", pageNumber]])
         data = self.get_data_by_query(query)
+        #only return the data that we need
         titles = [
             "fdcId",
             "description",
@@ -52,18 +57,19 @@ class api_handler():
                     foods[i][titles[j]] = ""  
         return foods
 
+    #get a food item by its fdcId
     def get_food_by_id(self,fdcId):
         query = self.generate_query("food", query = fdcId)
         return self.get_data_by_query(query)
     
+    #get only the data that we need from a food item
     def get_storeable_food_data(self, fdcId):
         foodItem = self.get_food_by_id(fdcId)
-        dateString = json.dumps({'date': datetime.date.today()}, default=str)
-        dateDict = json.loads(dateString)
+        #use the following structure to store the food item in the database
         structure: Dict[str, any] = {
             "fdcId": fdcId,
             "name": foodItem.get("description", ""),
-            "date": int(dateDict["date"].replace("-", "")),
+            "date": hf.get_today(),
             "per" : "",
             "nutrients": {
                 "kcal": {
@@ -92,22 +98,36 @@ class api_handler():
                 }
             }
         }
-        structure["per"] = foodItem.get("householdServingFullText", "")
+        #if the food item has a serving size, use that, otherwise use the household serving size
+        #if the food item has neither, use "100g"
+        if len(str(foodItem.get("servingSize", ""))) >= 0: 
+            structure["per"] = str(foodItem.get("servingSize", "")) +""+ foodItem.get("servingSizeUnit", "")
+        else:
+            structure["per"] = foodItem.get("householdServingFullText", "")
+        structure["per"] = ("100g", structure["per"])[len(structure["per"]) == 0]
+        #add the nutrients to the structure
         for nutrient in foodItem["foodNutrients"]:
             if nutrient["nutrient"]["id"] == 1008:
-                structure["nutrients"]["kcal"]["name"] = nutrient.get("nutrient", {}).get("name", "")
-                structure["nutrients"]["kcal"]["unitName"] = nutrient.get("nutrient", {}).get("unitName", "")
-                structure["nutrients"]["kcal"]["value"] = nutrient.get("labelNutrients", {}).get("calories", {}).get("value", 0)
+                self.add_nutrient(structure, foodItem, nutrient, "kcal", labelNutrient = "calories")
             elif nutrient["nutrient"]["id"] == 1004:
-                structure["nutrients"]["fat"]["name"] = nutrient.get("nutrient", {}).get("name", "")
-                structure["nutrients"]["fat"]["unitName"] = nutrient.get("nutrient", {}).get("unitName", "")
-                structure["nutrients"]["fat"]["value"] = foodItem.get("labelNutrients", {}).get("fat", {}).get("value", 0)
+                self.add_nutrient(structure, foodItem, nutrient, "fat")
             elif nutrient["nutrient"]["id"] == 1003:
-                structure["nutrients"]["protein"]["name"] = nutrient.get("nutrient", {}).get("name", "")
-                structure["nutrients"]["protein"]["unitName"] = nutrient.get("nutrient", {}).get("unitName", "")
-                structure["nutrients"]["protein"]["value"] = foodItem.get("labelNutrients", {}).get("protein", {}).get("value", 0)
+                self.add_nutrient(structure, foodItem, nutrient, "protein")
             elif nutrient["nutrient"]["id"] == 1079:
-                structure["nutrients"]["fiber"]["name"] = nutrient.get("nutrient", {}).get("name", "")
-                structure["nutrients"]["fiber"]["unitName"] = nutrient.get("nutrient", {}).get("unitName", "")
-                structure["nutrients"]["fiber"]["value"] = foodItem.get("labelNutrients", {}).get("fiber", {}).get("value", 0)
+                self.add_nutrient(structure, foodItem, nutrient, "fiber")
         return structure
+    
+    #add a nutrient to the structure of a storeable food item
+    def add_nutrient(self, structure, foodItem, nutrient, nutrient_name, labelNutrient = ""):
+        #labelNutrient is used, when the nutrient is not in the labelNutrients list
+        if labelNutrient == "":
+            labelNutrient = nutrient_name
+        #set a baseunit for the nutrient
+        baseunit = ("kcal", "g")[labelNutrient == "calories"]
+        structure["nutrients"][nutrient_name]["name"] = nutrient.get("nutrient", {}).get("name", "")
+        structure["nutrients"][nutrient_name]["unitName"] = nutrient.get("nutrient", {}).get("unitName", baseunit)
+        #if no amount is given, use the value from labelNutrients
+        if nutrient.get("amount", 0) != 0:
+            structure["nutrients"][nutrient_name]["value"] = nutrient.get("amount", 0)
+        else:
+            structure["nutrients"][nutrient_name]["value"] = foodItem.get("labelNutrients", {}).get(labelNutrient, {}).get("value", 0)
