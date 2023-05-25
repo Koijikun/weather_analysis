@@ -105,11 +105,12 @@ class api_handler():
         else:
             structure["per"] = foodItem.get("householdServingFullText", "")
         structure["per"] = ("100g", structure["per"])[len(structure["per"]) == 0]
-        #add the nutrients to the structure
+        
         #if "foodNutrients" is not in the food item, return False
         if "foodNutrients" not in foodItem:
             return False
         
+        #add the nutrients to the structure
         for nutrient in foodItem["foodNutrients"]:
             if nutrient["nutrient"]["id"] == 1008:
                 self.add_nutrient(structure, foodItem, nutrient, "kcal", labelNutrient = "calories")

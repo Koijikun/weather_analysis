@@ -59,7 +59,7 @@ while menu_input != 0:
             print("Adding "+foods[user_input - 1]["description"]+" to the database...")
             #add the food to the database
             stored = fdb.add_food(api.get_storeable_food_data(foods[user_input - 1]["fdcId"]))
-            if stored:
+            if stored != False:
                 print("Added "+foods[user_input - 1]["description"]+" to the database")
             else:
                 print("Error adding "+foods[user_input - 1]["description"]+" to the database")
