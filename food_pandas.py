@@ -1,8 +1,6 @@
-import food_db as fdb
 import pandas as pd
 import matplotlib.pyplot as plt
 from typing import Dict
-fdb = fdb.food_db()
 
 class food_pandas:
     def get_nutrient_values_from_food(self, food: Dict[str, any]) -> Dict[str, float]:

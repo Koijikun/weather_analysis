@@ -58,8 +58,11 @@ while menu_input != 0:
             print("You selected: ["+str(user_input)+"]" + " " + foods[user_input - 1]["description"])
             print("Adding "+foods[user_input - 1]["description"]+" to the database...")
             #add the food to the database
-            fdb.add_food(api.get_storeable_food_data(foods[user_input - 1]["fdcId"]))
-            print("Added "+foods[user_input - 1]["description"]+" to the database")
+            stored = fdb.add_food(api.get_storeable_food_data(foods[user_input - 1]["fdcId"]))
+            if stored:
+                print("Added "+foods[user_input - 1]["description"]+" to the database")
+            else:
+                print("Error adding "+foods[user_input - 1]["description"]+" to the database")
         elif user_input == 2:
             user_input = hf.get_user_input("Choose a datespan to analyze your nutrition\n[1] Today\n[2] Last 7 days\n[3] Last 30 days\n[4] Last 365 days\n[5] All time\n>")
             if user_input == 1:

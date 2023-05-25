@@ -6,6 +6,8 @@ col = db["foods"]
 class food_db:
 
     def add_food(self,food):
+        if food == False
+            return False
         col.insert_one(food)
 
     def get_food_by_id(self,fdcId):
