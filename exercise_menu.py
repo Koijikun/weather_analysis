@@ -63,17 +63,13 @@ def train_exercises(col):
     ex_count_input = hf.get_user_input("How many exercises do you want in your workout?\n>")
     if ex_count_input > len(exercises):
         print(f"Sorry, there are only {len(exercises)} exercises for {exercises[0]['bodypart']}.")
-    print(f"\nHere are {ex_count_input} exercises you can do for {exercises[0]['bodypart']}:\n")
+    print(f"\nHere are {len(exercises)} exercises you can do for {exercises[0]['bodypart']}:\n")
     ex_count = 0
     for exercise in exercises:
         if ex_count == ex_count_input:
             break
         if 'weight' in exercise:
             print(f"{exercise['name']} - {exercise['weight']} kg x {exercise['rep_goal']} reps\n----------------------")
-            print ("Instructions:")
-            for i in exercise['instructions']:
-                print (i)
         elif 'dur_goal' in exercise:
             print(f"{exercise['name']} - {exercise['dur_goal']} seconds")
-            print (exercise['instructions'])
         ex_count += 1

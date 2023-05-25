@@ -73,7 +73,6 @@ class food_pandas:
 
     def plot_chart_by_nutrients(self, foods: Dict[str, any], **customisation):
         df = self.convert_food_nutrient_values_to_df(foods, add_date=True)
-        print(df)
         #overwrite columns by extracting the date from its values as date time
         df.columns = pd.to_datetime(df.columns.str.split("_").str[0])
         #if there are multiple foods with the same date, sum them
@@ -87,7 +86,6 @@ class food_pandas:
             values = df.values.tolist()[0]
             
             df = pd.DataFrame({"nutrient" : indexes, 'g' : values}, index=indexes)
-            print(df)
             self.plot_bar_chart(df, **customisation)
             return
         
